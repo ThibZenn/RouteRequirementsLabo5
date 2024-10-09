@@ -33,7 +33,7 @@ namespace RouteRequirementsBL.Models
             {
                 if (value < 0)
                 {
-                    throw new LocatieException($"AfstandTotVorigeStop{value}");
+                    throw new LocatieException($"AfstandTotVorigeStop = {value} is kleiner dan 0");
                 }
                 _afstandTotVorigeStop = value; 
             }
