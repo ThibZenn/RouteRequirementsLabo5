@@ -9,21 +9,33 @@ namespace RouteRequirementsBL.Models
 {
     public class XRoute : IRoute
     {
-        private List<Locatie> LocatieList;
+        private Dictionary<string, Locatie> _locatieDictionary;
 
         public void AddLocation(string location, double distance, bool isStop)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            _locatieDictionary.Add(location, new Locatie(location, distance, isStop));
         }
 
         public double GetDistance()
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            List<Locatie> locatieList = new List<Locatie>();
+            locatieList.AddRange(this._locatieDictionary.Values);
+
+            double distance = 0;
+
+            foreach (Locatie locatie in locatieList)
+            {
+                distance += locatie.AfstandTotVorigeStop;
+            }
+            return distance;
         }
 
         public double GetDistance(string startLocation, string endLocation)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            if (_locatieDictionary.Contains(startLocation))
+            {
+
+            }
         }
 
         public bool HasLocation(string location)

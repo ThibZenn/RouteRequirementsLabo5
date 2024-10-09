@@ -15,6 +15,7 @@ namespace RouteRequirementsBL.Models
         public XRoute BuildRoute(List<string> locations, List<bool> stops, List<double> distances) 
         {
             throw new NotImplementedException(); //TODO method implementeren
+
         }
         public XRoute ReverseRoute(XRoute route) 
         {
