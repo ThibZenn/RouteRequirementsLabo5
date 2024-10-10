@@ -92,9 +92,15 @@ namespace RouteRequirementsBL.Models
             throw new NotImplementedException(); //TODO method implementeren
         }
 
-        public List<string> ShowLocations()
+        public List<string> ShowLocations() //Alle locaties van een route tonen.
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            List<string> locations = new List<string>();
+
+            foreach (var item in _locationDictionary.Values)
+            {
+                locations.Add(item.Name);
+            }
+            return locations;
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute()
@@ -109,12 +115,25 @@ namespace RouteRequirementsBL.Models
 
         public List<string> ShowStops()
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            List<string> stops = new List<string>();
+
+            foreach (var item in _locationDictionary.Values) //opm: beginstation is altijd een stop?
+            {
+                if (item.IsStop == true)
+                {
+                    stops.Add(item.Name);
+                }
+            }
+            return stops;
         }
 
         public void UpdateLocation(string location, string newName, bool isStop)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            if (_locationDictionary.ContainsKey(location))
+            {
+                _locationDictionary[location].Name = newName;
+                _locationDictionary[location].IsStop = isStop;
+            }
         }
     }
 }
