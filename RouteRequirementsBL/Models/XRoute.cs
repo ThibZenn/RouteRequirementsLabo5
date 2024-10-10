@@ -51,14 +51,20 @@ namespace RouteRequirementsBL.Models
             return totalDistance;
         }
 
-        public bool HasLocation(string location)
+        public bool HasLocation(string location) // kijken of de locatie in de route zit.
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            if (!_locationDictionary.ContainsKey(location)) return false;
+            return true;
         }
 
         public bool HasStop(string location)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            if (HasLocation(location)) // check of de locatie bestaat in de huidige context
+            {
+                return _locationDictionary[location].IsStop;
+            }
+            return false;
+
         }
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
