@@ -25,26 +25,14 @@ namespace RouteRequirementsBL.Models
             }
         }
 
-        private double _afstandTotVorigeStop;
-        public double AfstandTotVorigeStop
-        {
-            get { return _afstandTotVorigeStop; }
-            set 
-            {
-                if (value < 0)
-                {
-                    throw new LocatieException($"AfstandTotVorigeStop = {value} is kleiner dan 0");
-                }
-                _afstandTotVorigeStop = value; 
-            }
-        }
+        public Afstand Afstand {get; set;}
 
         public bool IsStop { get; set; }
 
-        public Locatie(string naam, double afstandTotVorigeStop, bool isStop)
+        public Locatie(string naam, Afstand afstand, bool isStop)
         {
             Naam = naam;
-            AfstandTotVorigeStop = afstandTotVorigeStop;
+            Afstand = afstand;
             IsStop = isStop;
         }
     }

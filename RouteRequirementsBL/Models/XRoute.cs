@@ -32,10 +32,7 @@ namespace RouteRequirementsBL.Models
 
         public double GetDistance(string startLocation, string endLocation)
         {
-            if (_locatieDictionary.Contains(startLocation))
-            {
-
-            }
+            throw new NotImplementedException(); //TODO method implementeren
         }
 
         public bool HasLocation(string location)
