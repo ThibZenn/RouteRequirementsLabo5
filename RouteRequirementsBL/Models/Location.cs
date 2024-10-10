@@ -7,32 +7,32 @@ using RouteRequirementsBL.Exceptions;
 
 namespace RouteRequirementsBL.Models
 {
-    public class Locatie
+    public class Location
     {
-		private string _naam;
+		private string _name;
 
-		public string Naam
+		public string Name
 		{
-			get { return _naam; }
+			get { return _name; }
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new LocatieException($"LocatieNaam is leeg");
+                    throw new LocationException($"LocatieNaam is empty");
                     //TODO in streamreader zorgen dat de naam altijd met een hoofdletter begint.
                 } 
-                _naam = value;
+                _name = value;
             }
         }
 
-        public Afstand Afstand {get; set;}
+        public Distance Distance {get; set;}
 
         public bool IsStop { get; set; }
 
-        public Locatie(string naam, Afstand afstand, bool isStop)
+        public Location(string name, Distance distance, bool isStop)
         {
-            Naam = naam;
-            Afstand = afstand;
+            Name = name;
+            Distance = distance;
             IsStop = isStop;
         }
     }

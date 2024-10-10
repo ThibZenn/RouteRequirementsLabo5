@@ -9,23 +9,23 @@ namespace RouteRequirementsBL.Models
 {
     public class XRoute : IRoute
     {
-        private Dictionary<string, Locatie> _locatieDictionary;
+        private Dictionary<string, Location> _locatieDictionary;
 
         public void AddLocation(string location, double distance, bool isStop)
         {
-            _locatieDictionary.Add(location, new Locatie(location, distance, isStop));
+            _locatieDictionary.Add(location, new Location(location, new Distance(distance), isStop));
         }
 
-        public double GetDistance()
+        public double GetDistance() // in klasse Afstand schrijven?
         {
-            List<Locatie> locatieList = new List<Locatie>();
-            locatieList.AddRange(this._locatieDictionary.Values);
+            List<Location> locationList = new List<Location>();
+            locationList.AddRange(this._locatieDictionary.Values);
 
             double distance = 0;
 
-            foreach (Locatie locatie in locatieList)
+            foreach (Location locatie in locationList)
             {
-                distance += locatie.AfstandTotVorigeStop;
+                distance += locatie.Distance.DistancePreviousStop;
             }
             return distance;
         }
