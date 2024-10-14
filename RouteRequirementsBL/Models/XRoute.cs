@@ -79,17 +79,38 @@ namespace RouteRequirementsBL.Models
 
         public void SetDistance(double distance, string location1, string location2)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            //TODO method implementeren
         }
 
         public (string start, List<(double distance, string location)>) ShowFullRoute()
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            string startLocation = _locationDictionary[0].Name;
+
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
+            foreach (Location location in _locationDictionary.Values)
+            {
+                route.Add((location.Distance.DistancePreviousStop, location.Name));
+            }
+
+            return (startLocation, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
+            List<Location> locationsList = _locationDictionary.Values.ToList();
+            int startIndex = locationsList.IndexOf(startLocation);
+            int endIndex = locationsList.IndexOf(endLocation);
+
+            if (_locationDictionary.ContainsKey(startLocation) && _locationDictionary.ContainsKey(endLocation))
+            {
+                for (global::System.Int32 i = index; global::System.Int32 i < locationsList.Count; global::System.Int32 i++)
+                {
+                    route.Add((locationsList[i].Distance.DistancePreviousStop), locationsList[i].Name);
+                }
+            }
+
+            return (startLocation, route);
         }
 
         public List<string> ShowLocations() //Alle locaties van een route tonen.
