@@ -25,12 +25,9 @@ namespace RouteRequirementsBL.Models
             }
         }
 
-        public bool IsStop { get; set; }
-
-        public Location(string name, bool isStop)
+        public Location(string name)
         {
             Name = name;
-            IsStop = isStop;
         }
     }
 }

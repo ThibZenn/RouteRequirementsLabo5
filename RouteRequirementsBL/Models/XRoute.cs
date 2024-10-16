@@ -13,6 +13,7 @@ namespace RouteRequirementsBL.Models
         // TODO: routeFactory instantie maken + juiste methode's aanroepen zodat we de route binnenkrijgen.
         public List<Location> Locations { get; set; }
         public List<Distance> Distances { get; set; }
+        public List<IsStop> IsStop { get; set; }
 
         public void AddLocation(string location, double distance, bool isStop)
         {
