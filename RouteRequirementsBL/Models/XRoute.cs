@@ -10,10 +10,18 @@ namespace RouteRequirementsBL.Models
 {
     public class XRoute : IRoute
     {
-        // TODO: routeFactory instantie maken + juiste methode's aanroepen zodat we de route binnenkrijgen.
+        
         public List<Location> Locations { get; set; }
         public List<Distance> Distances { get; set; }
         public List<SegmentLocatie> IsStop { get; set; }
+
+        //public (List<Location>, List<Distance>, List<SegmentLocatie>) _Route {get; set;}
+
+
+        internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
+        {
+            
+        }
 
         public void AddLocation(string location, double distance, bool isStop)
         {
@@ -22,51 +30,49 @@ namespace RouteRequirementsBL.Models
             IsStop.Add(new SegmentLocatie(isStop));
         }
 
-        public double GetDistance() // in klasse Afstand schrijven?
+        public double GetDistance() //Get the total distance
         {
-            List<Location> locationList = new List<Location>();
-            locationList.AddRange(this._locationDictionary.Values);
-
             double distance = 0;
 
-            foreach (Location locatie in locationList)
+            foreach (Distance locatie in Distances)
             {
-                distance += locatie.Distance.DistancePreviousStop;
+                distance += locatie.DistancePreviousStop;
             }
             return distance;
         }
 
         public double GetDistance(string startLocation, string endLocation)
         {
-            if (!_locationDictionary.ContainsKey(startLocation) && !_locationDictionary.ContainsKey(endLocation)) throw new RouteException("Start or End location doesn't excist in the current context"); //Check of de locaties bestaan
+            double totalDistance = 0;
 
-            List<Location> locationValuesList = new List<Location>(); // dictionary naar lijst maken om via de index aan de juiste values te geraken.
-            locationValuesList.AddRange(this._locationDictionary.Values);
+            int startIndex = Distances.FindIndex(x => x.StopA == startLocation);
+            int endIndex = Distances.FindIndex(x => x.StopB == endLocation);
 
-            int startIndex = _locationDictionary.Keys.ToList().IndexOf(startLocation); //TODO efficientere manier?
-            int endIndex = _locationDictionary.Keys.ToList().IndexOf(endLocation); //TODO efficientere manier?
-
-            double totalDistance = 0; //distance opteller resetten.
-
-            for (int i = startIndex; i <= endIndex; i++)
-            {
-                totalDistance += locationValuesList[i].Distance.DistancePreviousStop;
-            }
-
-            return totalDistance;
+            return totalDistance = Distances
+                .Skip(startIndex)
+                .Take(endIndex - startIndex) // neem de afstanden van het gevraagde deel.
+                .Sum(x => x.DistancePreviousStop); //opsomming afstanden
         }
 
         public bool HasLocation(string location) // kijken of de locatie in de route zit.
         {
-            if (!_locationDictionary.ContainsKey(location)) return false;
-            return true;
+            if (Locations.Contains(location)) return true;
+
         }
 
         public bool HasStop(string location)
         {
             if (HasLocation(location)) // check of de locatie bestaat in de huidige context
             {
-                return _locationDictionary[location].IsStop;
+                foreach (Location item in Locations)
+                {
+                    if(item.Name != location)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
             return false;
 
