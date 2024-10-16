@@ -7,28 +7,28 @@ using RouteRequirementsBL.Exceptions;
 
 namespace RouteRequirementsBL.Models
 {
-    public class Distance
+    public class Segment
     {
-        private double _distancePreviousStop;
+        private double _distance;
 
-        public double DistancePreviousStop
+        public double Distance
         {
-            get { return _distancePreviousStop; }
+            get { return _distance; }
             set
             {
                 if (value < 0)
                 {
                     throw new LocationException($"DistancePreviousStop = {value} is negative");
                 }
-                _distancePreviousStop = value;
+                _distance = value;
             }
         }
         public string StopA { get; set; }
         public string StopB { get; set; }
 
-        public Distance(double distancePreviousStop, string stopA, string stopB)
+        public Segment(double distance, string stopA, string stopB)
         {
-            DistancePreviousStop = distancePreviousStop;
+            Distance = distance;
             StopA = stopA;
             StopB = stopB;
         }

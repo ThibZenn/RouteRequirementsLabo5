@@ -20,7 +20,7 @@ namespace RouteRequirementsBL.Models
             if (File.Exists(logFilePath)) File.WriteAllText(logFilePath, string.Empty);
 
             List<Location> locationsList = new List<Location>();
-            List<Distance> distancesList = new List<Distance>();
+            List<Segment> distancesList = new List<Segment>();
             List<SegmentLocatie> segmentList = new List<SegmentLocatie>();
 
             using (StreamReader sr = new StreamReader(fileName))
@@ -57,13 +57,13 @@ namespace RouteRequirementsBL.Models
                             if (teller == 0)
                             {
                                 // De eerste stop moet hetzelfde start als eindpunt hebben.
-                                Distance distance = new Distance(distanceInt, locationString, locationString);
+                                Segment distance = new Segment(distanceInt, locationString, locationString);
                                 distancesList.Add(distance);
                             }
                             else
                             {
                                 // Distance toekennen en puntA toewijzen met de data van de vorige locatie.
-                                Distance distance = new Distance(distanceInt, distancesList[teller - 1].StopB, locationString);
+                                Segment distance = new Segment(distanceInt, distancesList[teller - 1].StopB, locationString);
                                 distancesList.Add(distance);
                             }
 
@@ -86,12 +86,12 @@ namespace RouteRequirementsBL.Models
                             {
                                 distancesMatch2.Add(0);
                                 distancesMatch2.Add(distanceInt);
-                                Distance distance = new Distance(distancesMatch2[teller], locationString, locationString);
+                                Segment distance = new Segment(distancesMatch2[teller], locationString, locationString);
                                 distancesList.Add(distance);
                             }
                             else
                             {
-                                Distance distance = new Distance(distancesMatch2[teller], distancesList[teller - 1].StopB, locationString);
+                                Segment distance = new Segment(distancesMatch2[teller], distancesList[teller - 1].StopB, locationString);
                                 distancesList.Add(distance);
                             }
                             
@@ -109,7 +109,7 @@ namespace RouteRequirementsBL.Models
                 {
                     route.Locations.Add(location);
                 }
-                foreach (Distance distance in distancesList)
+                foreach (Segment distance in distancesList)
                 {
                     route.Distances.Add(distance);
                 }

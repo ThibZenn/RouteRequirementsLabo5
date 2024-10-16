@@ -12,7 +12,7 @@ namespace RouteRequirementsBL.Models
     {
         
         public List<Location> Locations { get; set; }
-        public List<Distance> Distances { get; set; }
+        public List<Segment> Distances { get; set; }
         public List<SegmentLocatie> IsStop { get; set; }
 
         //public (List<Location>, List<Distance>, List<SegmentLocatie>) _Route {get; set;}
@@ -26,7 +26,7 @@ namespace RouteRequirementsBL.Models
         public void AddLocation(string location, double distance, bool isStop)
         {
             Locations.Add(new Location(location));
-            Distances.Add(new Distance(distance, Distances[(Distances.Count)-1].StopB, location));
+            Distances.Add(new Segment(distance, Distances[(Distances.Count)-1].StopB, location));
             IsStop.Add(new SegmentLocatie(isStop));
         }
 
@@ -34,9 +34,9 @@ namespace RouteRequirementsBL.Models
         {
             double distance = 0;
 
-            foreach (Distance locatie in Distances)
+            foreach (Segment locatie in Distances)
             {
-                distance += locatie.DistancePreviousStop;
+                distance += locatie.Distance;
             }
             return distance;
         }
@@ -51,7 +51,7 @@ namespace RouteRequirementsBL.Models
             return totalDistance = Distances
                 .Skip(startIndex)
                 .Take(endIndex - startIndex) // neem de afstanden van het gevraagde deel.
-                .Sum(x => x.DistancePreviousStop); //opsomming afstanden
+                .Sum(x => x.Distance); //opsomming afstanden
         }
 
         public bool HasLocation(string location) // kijken of de locatie in de route zit.
