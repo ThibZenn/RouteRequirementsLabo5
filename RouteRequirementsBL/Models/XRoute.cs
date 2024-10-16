@@ -14,9 +14,6 @@ namespace RouteRequirementsBL.Models
         public List<Location> Locations { get; set; }
         public List<Distance> Distances { get; set; }
 
-
-        private Dictionary<string, Location> _locationDictionary;
-
         public void AddLocation(string location, double distance, bool isStop)
         {
             _locationDictionary.Add(location, new Location(location, new Distance(distance), isStop));

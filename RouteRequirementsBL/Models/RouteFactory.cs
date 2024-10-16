@@ -33,8 +33,8 @@ namespace RouteRequirementsBL.Models
                     try
                     {
                         // Regex pattern apart schrijven omdat we hem meerdere keren gebruiken.
-                        string pattern = @"^(.+?),(\d+),(true|false)$";
-                        string pattern2 = @"^(.+?)\((stop|transit)\),(.+?)\((stop|transit)\),(\d+)$";
+                        string pattern = @"^(.+?),(\d+),(true|false)$"; //Regex eerste fileSoort
+                        string pattern2 = @"^(.+?)\((stop|transit)\),(.+?)\((stop|transit)\),(\d+)$"; //Regex tweede FileSoort.
                         Match match = Regex.Match(line, pattern);
                         Match match2 = Regex.Match(line, pattern2);
                         List<int> distancesMatch2 = new List<int>();
@@ -67,6 +67,7 @@ namespace RouteRequirementsBL.Models
                             teller++;
                         }
 
+                        // Als er een match is met het tweede patroon gaan we verder
                         if (match2.Success)
                         {
                             string locationString = match.Groups[1].Value;
