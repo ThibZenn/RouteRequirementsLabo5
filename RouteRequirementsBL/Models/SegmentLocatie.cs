@@ -8,6 +8,11 @@ namespace RouteRequirementsBL.Models
 {
     public class SegmentLocatie
     {
-        public double IsStop { get; set; }
+        public SegmentLocatie(bool isStop)
+        {
+            IsStop = isStop;
+        }
+
+        public bool IsStop { get; set; }
     }
 }

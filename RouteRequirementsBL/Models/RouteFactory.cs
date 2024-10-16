@@ -21,6 +21,7 @@ namespace RouteRequirementsBL.Models
 
             List<Location> locationsList = new List<Location>();
             List<Distance> distancesList = new List<Distance>();
+            List<SegmentLocatie> segmentList = new List<SegmentLocatie>();
 
             using (StreamReader sr = new StreamReader(fileName))
             {
@@ -48,7 +49,9 @@ namespace RouteRequirementsBL.Models
                             bool isStopBool = bool.Parse(match.Groups[3].Value);
 
                             // maak een nieuw object van locatie aan en voeg deze toe in de lijst.
-                            Location location = new Location(locationString, isStopBool);
+                            Location location = new Location(locationString);
+                            SegmentLocatie segmentLocatie = new SegmentLocatie(isStopBool);
+                            segmentList.Add(segmentLocatie);
                             locationsList.Add(location);
 
                             if (teller == 0)
@@ -74,7 +77,9 @@ namespace RouteRequirementsBL.Models
                             bool isStopBool = bool.Parse(match2.Groups[2].Value);
                             int distanceInt = int.Parse(match2.Groups[5].Value);
 
-                            Location location = new Location(locationString, isStopBool);
+                            Location location = new Location(locationString);
+                            SegmentLocatie segmentLocatie = new SegmentLocatie(isStopBool);
+                            segmentList.Add(segmentLocatie);
                             locationsList.Add(location);
 
                             if(teller == 0)

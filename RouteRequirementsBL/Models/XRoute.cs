@@ -13,11 +13,13 @@ namespace RouteRequirementsBL.Models
         // TODO: routeFactory instantie maken + juiste methode's aanroepen zodat we de route binnenkrijgen.
         public List<Location> Locations { get; set; }
         public List<Distance> Distances { get; set; }
-        public List<IsStop> IsStop { get; set; }
+        public List<SegmentLocatie> IsStop { get; set; }
 
         public void AddLocation(string location, double distance, bool isStop)
         {
-            _locationDictionary.Add(location, new Location(location, new Distance(distance), isStop));
+            Locations.Add(new Location(location));
+            Distances.Add(new Distance(distance, Distances[(Distances.Count)-1].StopB, location));
+            IsStop.Add(new SegmentLocatie(isStop));
         }
 
         public double GetDistance() // in klasse Afstand schrijven?
