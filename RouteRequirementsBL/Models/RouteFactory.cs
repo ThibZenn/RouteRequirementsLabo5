@@ -105,13 +105,17 @@ namespace RouteRequirementsBL.Models
                 }
 
                 //add locations to the Route
-                foreach (var location in locationsList)
+                foreach (Location location in locationsList)
                 {
                     route.Locations.Add(location);
                 }
-                foreach (var distance in distancesList)
+                foreach (Distance distance in distancesList)
                 {
                     route.Distances.Add(distance);
+                }
+                foreach (SegmentLocatie item in segmentList)
+                {
+                    route.IsStop.Add(item);
                 }
             }
 
