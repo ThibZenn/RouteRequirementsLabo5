@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using RouteRequirementsBL.Exceptions;
@@ -12,8 +13,8 @@ namespace RouteRequirementsBL.Models
     {
         
         public List<Location> Locations { get; set; }
-        public List<Segment> Distances { get; set; }
-        public List<SegmentLocatie> IsStop { get; set; }
+        public List<Segment> Segment { get; set; }
+        public List<SegmentLocatie> SegmentLocatie { get; set; }
 
         //public (List<Location>, List<Distance>, List<SegmentLocatie>) _Route {get; set;}
 
@@ -26,15 +27,15 @@ namespace RouteRequirementsBL.Models
         public void AddLocation(string location, double distance, bool isStop)
         {
             Locations.Add(new Location(location));
-            Distances.Add(new Segment(distance, Distances[(Distances.Count)-1].StopB, location));
-            IsStop.Add(new SegmentLocatie(isStop));
+            Segment.Add(new Segment(distance, Segment[(Segment.Count)-1].StopB, location));
+            SegmentLocatie.Add(new SegmentLocatie(isStop));
         }
 
         public double GetDistance() //Get the total distance
         {
             double distance = 0;
 
-            foreach (Segment locatie in Distances)
+            foreach (Segment locatie in Segment)
             {
                 distance += locatie.Distance;
             }
@@ -45,10 +46,10 @@ namespace RouteRequirementsBL.Models
         {
             double totalDistance = 0;
 
-            int startIndex = Distances.FindIndex(x => x.StopA == startLocation);
-            int endIndex = Distances.FindIndex(x => x.StopB == endLocation);
+            int startIndex = Segment.FindIndex(x => x.StopA == startLocation);
+            int endIndex = Segment.FindIndex(x => x.StopB == endLocation);
 
-            return totalDistance = Distances
+            return totalDistance = Segment
                 .Skip(startIndex)
                 .Take(endIndex - startIndex) // neem de afstanden van het gevraagde deel.
                 .Sum(x => x.Distance); //opsomming afstanden
@@ -56,24 +57,23 @@ namespace RouteRequirementsBL.Models
 
         public bool HasLocation(string location) // kijken of de locatie in de route zit.
         {
-            if (Locations.Contains(location)) return true;
-
+            foreach (Location item in Locations)
+            {
+                if (item.Name == location)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool HasStop(string location)
         {
-            if (HasLocation(location)) // check of de locatie bestaat in de huidige context
-            {
-                foreach (Location item in Locations)
-                {
-                    if(item.Name != location)
-                    {
-                        return false;
-                    }
-                }
+            int indexOfLocation = Locations.FindIndex( x => x.Name == location);
 
+            if (SegmentLocatie[indexOfLocation].IsStop) 
                 return true;
-            }
+
             return false;
 
         }
@@ -90,47 +90,51 @@ namespace RouteRequirementsBL.Models
 
         public void SetDistance(double distance, string location1, string location2)
         {
-            //TODO method implementeren
+            foreach (Segment item in Segment)
+            {
+                if (item.StopA == location1 && item.StopB == location2)
+                {
+                    item.Distance = distance;
+                }
+            }
         }
 
-        public (string start, List<(double distance, string location)>) ShowFullRoute()
+        public (string start, List<(double distance, string location)>) ShowFullRoute() //OPM: mag de beginStop nog in de list voorkomen?
         {
-            string startLocation = _locationDictionary.First().Value.Name;
-
+            //nieuwe instantie van de tuple lijst aanmaken
             List<(double distance, string location)> route = new List<(double distance, string location)>();
-            foreach (Location location in _locationDictionary.Values)
+
+            //loop over lijst van segmenten en items toewijzen aan de list.
+            foreach (Segment item in Segment)
             {
-                route.Add((location.Distance.DistancePreviousStop, location.Name));
+                route.Add((item.Distance, item.StopB));
             }
 
-            return (startLocation, route);
+            return (Segment[0].StopA, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation)
         {
-            List<(double distance, string location)> route = new List<(double distance, string location)>();
-            // dictionary naar list omvormen zodat we de index kunnen zoeken met linq statements
-            List<Location> locationsList = _locationDictionary.Values.ToList();
-            //linq statements om de index te vinden van startIndex en endIndex
-            int startIndex = locationsList.FindIndex(loc => loc.Name == startLocation);
-            int endIndex = locationsList.FindIndex(loc => loc.Name == endLocation);
+            //nieuwe instantie van de tuple lijst maken
+            List<(double distance, string location)> route = new List<(double distance, string location)> ();
 
-            if (_locationDictionary.ContainsKey(startLocation) && _locationDictionary.ContainsKey(endLocation))
+            int startIndex = Segment.FindIndex(x => x.StopA == startLocation);
+            int endIndex = Segment.FindIndex(x => x.StopB == endLocation);
+
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int i = startIndex; i <= endIndex; i++)
-                {
-                    route.Add((locationsList[i].Distance.DistancePreviousStop, locationsList[i].Name));
-                }
+                route.Add((Segment[i].Distance, Segment[i].StopB));
             }
 
-            return (startLocation, route);
+            return (Segment[0].StopA,route);
+
         }
 
         public List<string> ShowLocations() //Alle locaties van een route tonen.
         {
             List<string> locations = new List<string>();
 
-            foreach (var item in _locationDictionary.Values)
+            foreach (var item in Locations)
             {
                 locations.Add(item.Name);
             }
@@ -139,64 +143,79 @@ namespace RouteRequirementsBL.Models
 
         public (string start, List<(double distance, string location)>) ShowRoute() // De hele route behalve degenen die geen stop zijn
         {
-            string startLocation = _locationDictionary.First().Value.Name;
+            double accumulatedDistance = 0;
             //instantie maken van de tuple list
             List<(double distance, string location)> route = new List<(double distance, string location)>();
             //lopen over de dictionary en kijken of de locatie's op een route een stop zijn of niet.
-            foreach (Location location in _locationDictionary.Values)
+            for (int i = 0; i < Locations.Count - 1; i++)
             {
-                if (location.IsStop)
+                accumulatedDistance += Segment[i].Distance;
+
+                if (SegmentLocatie[i + 1].IsStop)
                 {
-                    route.Add((location.Distance.DistancePreviousStop, location.Name));
+                    route.Add((accumulatedDistance, Locations[i + 1].Name));
+                    accumulatedDistance = 0;
                 }
             }
 
-            return (startLocation, route);
+            return (Segment[0].StopB, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute(string startLocation, string endLocation)
         {
-            List<(double distance, string location)> route = new List<(double distance, string location)>();
-            // dictionary naar list omvormen zodat we de index kunnen zoeken met linq statements
-            List<Location> locationsList = _locationDictionary.Values.ToList();
-            //linq statements om de index te vinden van startIndex en endIndex
-            int startIndex = locationsList.FindIndex(loc => loc.Name == startLocation);
-            int endIndex = locationsList.FindIndex(loc => loc.Name == endLocation);
 
-            if (_locationDictionary.ContainsKey(startLocation) && _locationDictionary.ContainsKey(endLocation))
+            //linq statements om de index te vinden van startIndex en endIndex
+            int startIndex = Locations.FindIndex(loc => loc.Name == startLocation);
+            int endIndex = Locations.FindIndex(loc => loc.Name == endLocation);
+
+            double accumulatedDistance = 0;
+            //instantie maken van de tuple list
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
+            //lopen over de dictionary en kijken of de locatie's op een route een stop zijn of niet.
+
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int i = startIndex; i <= endIndex; i++)
+                accumulatedDistance += Segment[i].Distance;
+
+                if (SegmentLocatie[i + 1].IsStop)
                 {
-                    if (locationsList[i].IsStop)
-                    {
-                        route.Add((locationsList[i].Distance.DistancePreviousStop, locationsList[i].Name));
-                    }
+                    route.Add((accumulatedDistance, Locations[i + 1].Name));
+                    accumulatedDistance = 0;
                 }
             }
 
-            return (startLocation, route);
+            return (Segment[0].StopB, route);
         }
 
         public List<string> ShowStops()
         {
             List<string> stops = new List<string>();
+            //Teller bijhouden zodat we weten op welke index we moeten zoeken voor de naam.
+            int indexTeller = 0;
 
-            foreach (var item in _locationDictionary.Values) //opm: beginstation is altijd een stop?
+            foreach (SegmentLocatie item in SegmentLocatie) //opm: beginstation is altijd een stop?
             {
                 if (item.IsStop == true)
                 {
-                    stops.Add(item.Name);
+                    stops.Add(Locations[indexTeller].Name);
                 }
+                indexTeller++;
             }
             return stops;
         }
 
         public void UpdateLocation(string location, string newName, bool isStop)
         {
-            if (_locationDictionary.ContainsKey(location))
+            int indexTeller = 0;
+
+            foreach (Location item in Locations)
             {
-                _locationDictionary[location].Name = newName;
-                _locationDictionary[location].IsStop = isStop;
+                if (item.Name == location)
+                {
+                    item.Name = newName;
+                    SegmentLocatie[indexTeller].IsStop = isStop;
+                }
+                indexTeller++;
             }
         }
     }

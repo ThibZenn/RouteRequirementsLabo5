@@ -111,11 +111,11 @@ namespace RouteRequirementsBL.Models
                 }
                 foreach (Segment distance in distancesList)
                 {
-                    route.Distances.Add(distance);
+                    route.Segment.Add(distance);
                 }
                 foreach (SegmentLocatie item in segmentList)
                 {
-                    route.IsStop.Add(item);
+                    route.SegmentLocatie.Add(item);
                 }
             }
 
