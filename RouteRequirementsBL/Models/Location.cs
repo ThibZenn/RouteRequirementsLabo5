@@ -25,14 +25,11 @@ namespace RouteRequirementsBL.Models
             }
         }
 
-        public Distance Distance {get; set;}
-
         public bool IsStop { get; set; }
 
-        public Location(string name, Distance distance, bool isStop)
+        public Location(string name, bool isStop)
         {
             Name = name;
-            Distance = distance;
             IsStop = isStop;
         }
     }

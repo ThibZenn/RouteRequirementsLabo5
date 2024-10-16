@@ -10,6 +10,11 @@ namespace RouteRequirementsBL.Models
 {
     public class XRoute : IRoute
     {
+        // TODO: routeFactory instantie maken + juiste methode's aanroepen zodat we de route binnenkrijgen.
+        public List<Location> Locations { get; set; }
+        public List<Distance> Distances { get; set; }
+
+
         private Dictionary<string, Location> _locationDictionary;
 
         public void AddLocation(string location, double distance, bool isStop)
@@ -84,7 +89,7 @@ namespace RouteRequirementsBL.Models
 
         public (string start, List<(double distance, string location)>) ShowFullRoute()
         {
-            string startLocation = _locationDictionary[0].Name;
+            string startLocation = _locationDictionary.First().Value.Name;
 
             List<(double distance, string location)> route = new List<(double distance, string location)>();
             foreach (Location location in _locationDictionary.Values)
@@ -98,15 +103,17 @@ namespace RouteRequirementsBL.Models
         public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation)
         {
             List<(double distance, string location)> route = new List<(double distance, string location)>();
+            // dictionary naar list omvormen zodat we de index kunnen zoeken met linq statements
             List<Location> locationsList = _locationDictionary.Values.ToList();
-            int startIndex = locationsList.IndexOf(startLocation);
-            int endIndex = locationsList.IndexOf(endLocation);
+            //linq statements om de index te vinden van startIndex en endIndex
+            int startIndex = locationsList.FindIndex(loc => loc.Name == startLocation);
+            int endIndex = locationsList.FindIndex(loc => loc.Name == endLocation);
 
             if (_locationDictionary.ContainsKey(startLocation) && _locationDictionary.ContainsKey(endLocation))
             {
-                for (global::System.Int32 i = index; global::System.Int32 i < locationsList.Count; global::System.Int32 i++)
+                for (int i = startIndex; i <= endIndex; i++)
                 {
-                    route.Add((locationsList[i].Distance.DistancePreviousStop), locationsList[i].Name);
+                    route.Add((locationsList[i].Distance.DistancePreviousStop, locationsList[i].Name));
                 }
             }
 
@@ -124,14 +131,44 @@ namespace RouteRequirementsBL.Models
             return locations;
         }
 
-        public (string start, List<(double distance, string location)>) ShowRoute()
+        public (string start, List<(double distance, string location)>) ShowRoute() // De hele route behalve degenen die geen stop zijn
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            string startLocation = _locationDictionary.First().Value.Name;
+            //instantie maken van de tuple list
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
+            //lopen over de dictionary en kijken of de locatie's op een route een stop zijn of niet.
+            foreach (Location location in _locationDictionary.Values)
+            {
+                if (location.IsStop)
+                {
+                    route.Add((location.Distance.DistancePreviousStop, location.Name));
+                }
+            }
+
+            return (startLocation, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute(string startLocation, string endLocation)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
+            // dictionary naar list omvormen zodat we de index kunnen zoeken met linq statements
+            List<Location> locationsList = _locationDictionary.Values.ToList();
+            //linq statements om de index te vinden van startIndex en endIndex
+            int startIndex = locationsList.FindIndex(loc => loc.Name == startLocation);
+            int endIndex = locationsList.FindIndex(loc => loc.Name == endLocation);
+
+            if (_locationDictionary.ContainsKey(startLocation) && _locationDictionary.ContainsKey(endLocation))
+            {
+                for (int i = startIndex; i <= endIndex; i++)
+                {
+                    if (locationsList[i].IsStop)
+                    {
+                        route.Add((locationsList[i].Distance.DistancePreviousStop, locationsList[i].Name));
+                    }
+                }
+            }
+
+            return (startLocation, route);
         }
 
         public List<string> ShowStops()

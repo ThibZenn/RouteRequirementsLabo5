@@ -23,12 +23,14 @@ namespace RouteRequirementsBL.Models
                 _distancePreviousStop = value;
             }
         }
-        //public string VorigeStop { get; set; }
+        public string StopA { get; set; }
+        public string StopB { get; set; }
 
-        public Distance(double distancePreviousStop)
+        public Distance(double distancePreviousStop, string stopA, string stopB)
         {
             DistancePreviousStop = distancePreviousStop;
-            //VorigeStop = vorigeStop;
+            StopA = stopA;
+            StopB = stopB;
         }
     }
 }
