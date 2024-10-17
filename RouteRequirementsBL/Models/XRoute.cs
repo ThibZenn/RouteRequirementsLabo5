@@ -80,12 +80,33 @@ namespace RouteRequirementsBL.Models
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            int indexInsertLocation = Locations.FindIndex( x => x.Name == fromLocation);
+            //nieuwe instanties aanmaken
+            Segment newSegment = new Segment(distance,fromLocation,location);
+            SegmentLocatie newSegmentLocatie = new SegmentLocatie(isStop);
+            Location newLocation = new Location(location);
+
+            //nieuwe instanties op de juiste plaats toewijzen in de list
+            Segment.Insert(indexInsertLocation,newSegment);
+            SegmentLocatie.Insert(indexInsertLocation,newSegmentLocatie);
+            Locations.Insert(indexInsertLocation,newLocation);
+
+            
+
         }
 
         public void RemoveLocation(string location)
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            int indexOfLocation = Locations.FindIndex(x => x.Name == location);
+            //distance van te verwijderen segment opslaan
+            double distance = Segment[indexOfLocation].Distance;
+            //segment op die index verwijderen
+            Segment.RemoveAt(indexOfLocation);
+            //segment +1 moet aangepast worden
+            Segment[indexOfLocation + 1].Distance += distance;
+            Segment[indexOfLocation + 1].StopA = Segment[indexOfLocation].StopB;
+            //segmentLocation moet op die index verwijderd worden
+            SegmentLocatie.RemoveAt(indexOfLocation);
         }
 
         public void SetDistance(double distance, string location1, string location2)
