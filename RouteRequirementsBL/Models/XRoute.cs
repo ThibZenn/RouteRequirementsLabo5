@@ -80,19 +80,26 @@ namespace RouteRequirementsBL.Models
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
-            int indexInsertLocation = Locations.FindIndex( x => x.Name == fromLocation);
-            //nieuwe instanties aanmaken
-            Segment newSegment = new Segment(distance,fromLocation,location);
-            SegmentLocatie newSegmentLocatie = new SegmentLocatie(isStop);
-            Location newLocation = new Location(location);
-
-            //nieuwe instanties op de juiste plaats toewijzen in de list
-            Segment.Insert(indexInsertLocation,newSegment);
-            SegmentLocatie.Insert(indexInsertLocation,newSegmentLocatie);
-            Locations.Insert(indexInsertLocation,newLocation);
-
             
+            int indexInsertLocation = Locations.FindIndex( x => x.Name == fromLocation) +1; //we doen +1 want zonder zouden we de index hebben van de fromlocatie zelf.
 
+            if (indexInsertLocation < 0 && indexInsertLocation >= Locations.Count - 1)
+            {
+                //nieuwe instanties op de juiste plaats toewijzen in de list
+                Segment.Insert(indexInsertLocation, new Segment(distance,fromLocation,location));
+                SegmentLocatie.Insert(indexInsertLocation, new SegmentLocatie(isStop));
+                Locations.Insert(indexInsertLocation, new Location(location));
+
+                //segmenten omrekenen
+                Segment[indexInsertLocation + 1].Distance -= distance;
+
+                //segment van vorige locatie veranderen.
+                Segment[indexInsertLocation + 1].StopA = location;
+            } 
+            else if (indexInsertLocation == Locations.Count - 1)
+                AddLocation(location,distance,isStop);
+
+            //TODO als je een nieuwe beginstation wilt toevoegen
         }
 
         public void RemoveLocation(string location)

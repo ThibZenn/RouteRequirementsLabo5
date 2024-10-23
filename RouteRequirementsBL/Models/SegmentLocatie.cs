@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace RouteRequirementsBL.Models
 {
-    public class SegmentLocatie
+    public class SegmentLocatie : Location
     {
-        public SegmentLocatie(bool isStop)
+        public SegmentLocatie(string name, bool isStop) : base(name)
         {
             IsStop = isStop;
         }
-
+            
         public bool IsStop { get; set; }
     }
 }
