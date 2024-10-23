@@ -23,10 +23,10 @@ namespace RouteRequirementsBL.Models
                 _distance = value;
             }
         }
-        public string StopA { get; set; }
-        public string StopB { get; set; }
+        public SegmentLocatie StopA { get; set; }
+        public SegmentLocatie StopB { get; set; }
 
-        public Segment(double distance, string stopA, string stopB)
+        public Segment(double distance, SegmentLocatie stopA, SegmentLocatie stopB)
         {
             Distance = distance;
             StopA = stopA;

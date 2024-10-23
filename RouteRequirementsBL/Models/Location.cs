@@ -7,7 +7,7 @@ using RouteRequirementsBL.Exceptions;
 
 namespace RouteRequirementsBL.Models
 {
-    public class Location
+    public abstract class Location
     {
 		private string _name;
 

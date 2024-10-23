@@ -12,12 +12,7 @@ namespace RouteRequirementsBL.Models
     public class XRoute : IRoute
     {
         
-        public List<Location> Locations { get; set; }
-        public List<Segment> Segment { get; set; }
-        public List<SegmentLocatie> SegmentLocatie { get; set; }
-
-        //public (List<Location>, List<Distance>, List<SegmentLocatie>) _Route {get; set;}
-
+        private List<Segment> _segmentList { get; set; }
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
         {
@@ -26,16 +21,19 @@ namespace RouteRequirementsBL.Models
 
         public void AddLocation(string location, double distance, bool isStop)
         {
-            Locations.Add(new Location(location));
-            Segment.Add(new Segment(distance, Segment[(Segment.Count)-1].StopB, location));
-            SegmentLocatie.Add(new SegmentLocatie(isStop));
+            if (_segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location)))
+            {
+                throw new RouteException($"{location} bestaat al");
+            }
+
+            _segmentList.Add(new Segment(distance, _segmentList[_segmentList.Count - 1].StopB, new SegmentLocatie(location,isStop)));
         }
 
         public double GetDistance() //Get the total distance
         {
             double distance = 0;
 
-            foreach (Segment locatie in Segment)
+            foreach (Segment locatie in _segmentList)
             {
                 distance += locatie.Distance;
             }
@@ -46,10 +44,10 @@ namespace RouteRequirementsBL.Models
         {
             double totalDistance = 0;
 
-            int startIndex = Segment.FindIndex(x => x.StopA == startLocation);
-            int endIndex = Segment.FindIndex(x => x.StopB == endLocation);
+            int startIndex = _segmentList.FindIndex(x => x.StopA.Name == startLocation);
+            int endIndex = _segmentList.FindIndex(x => x.StopB.Name == endLocation);
 
-            return totalDistance = Segment
+            return totalDistance = _segmentList
                 .Skip(startIndex)
                 .Take(endIndex - startIndex) // neem de afstanden van het gevraagde deel.
                 .Sum(x => x.Distance); //opsomming afstanden
@@ -57,9 +55,9 @@ namespace RouteRequirementsBL.Models
 
         public bool HasLocation(string location) // kijken of de locatie in de route zit.
         {
-            foreach (Location item in Locations)
+            for (int i = 0; i < _segmentList.Count - 1; i++)
             {
-                if (item.Name == location)
+                if (_segmentList[i].StopA.Name == location)
                 {
                     return true;
                 }
@@ -69,58 +67,35 @@ namespace RouteRequirementsBL.Models
 
         public bool HasStop(string location)
         {
-            int indexOfLocation = Locations.FindIndex( x => x.Name == location);
-
-            if (SegmentLocatie[indexOfLocation].IsStop) 
-                return true;
-
-            return false;
-
+            return _segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location));
         }
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
             
-            int indexInsertLocation = Locations.FindIndex( x => x.Name == fromLocation) +1; //we doen +1 want zonder zouden we de index hebben van de fromlocatie zelf.
+            int indexInsertLocation = _segmentList.FindIndex( x =>( x.StopA.Name == fromLocation) || (x.StopB.Name == fromLocation)) +1; //we doen +1 want zonder zouden we de index hebben van de fromlocatie zelf.
 
-            if (indexInsertLocation < 0 && indexInsertLocation >= Locations.Count - 1)
-            {
-                //nieuwe instanties op de juiste plaats toewijzen in de list
-                Segment.Insert(indexInsertLocation, new Segment(distance,fromLocation,location));
-                SegmentLocatie.Insert(indexInsertLocation, new SegmentLocatie(isStop));
-                Locations.Insert(indexInsertLocation, new Location(location));
-
-                //segmenten omrekenen
-                Segment[indexInsertLocation + 1].Distance -= distance;
-
-                //segment van vorige locatie veranderen.
-                Segment[indexInsertLocation + 1].StopA = location;
-            } 
-            else if (indexInsertLocation == Locations.Count - 1)
-                AddLocation(location,distance,isStop);
-
-            //TODO als je een nieuwe beginstation wilt toevoegen
+            //TODO insertLocation toevoegen
         }
 
         public void RemoveLocation(string location)
         {
-            int indexOfLocation = Locations.FindIndex(x => x.Name == location);
+            int indexOfLocation = _segmentList.FindIndex(x => (x.StopA.Name == location) || (x.StopB.Name == location));
             //distance van te verwijderen segment opslaan
-            double distance = Segment[indexOfLocation].Distance;
+            double distance = _segmentList[indexOfLocation].Distance;
             //segment op die index verwijderen
-            Segment.RemoveAt(indexOfLocation);
+            _segmentList.RemoveAt(indexOfLocation);
             //segment +1 moet aangepast worden
-            Segment[indexOfLocation + 1].Distance += distance;
-            Segment[indexOfLocation + 1].StopA = Segment[indexOfLocation].StopB;
-            //segmentLocation moet op die index verwijderd worden
-            SegmentLocatie.RemoveAt(indexOfLocation);
+            _segmentList[indexOfLocation + 1].Distance += distance;
+            _segmentList[indexOfLocation + 1].StopA = _segmentList[indexOfLocation].StopB;
+
         }
 
         public void SetDistance(double distance, string location1, string location2)
         {
-            foreach (Segment item in Segment)
+            foreach (Segment item in _segmentList)
             {
-                if (item.StopA == location1 && item.StopB == location2)
+                if (item.StopA.Name == location1 && item.StopB.Name == location2)
                 {
                     item.Distance = distance;
                 }
@@ -133,12 +108,12 @@ namespace RouteRequirementsBL.Models
             List<(double distance, string location)> route = new List<(double distance, string location)>();
 
             //loop over lijst van segmenten en items toewijzen aan de list.
-            foreach (Segment item in Segment)
+            foreach (Segment item in _segmentList)
             {
-                route.Add((item.Distance, item.StopB));
+                route.Add((item.Distance, item.StopB.Name));
             }
 
-            return (Segment[0].StopA, route);
+            return (_segmentList[0].StopA.Name, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation)
@@ -146,25 +121,26 @@ namespace RouteRequirementsBL.Models
             //nieuwe instantie van de tuple lijst maken
             List<(double distance, string location)> route = new List<(double distance, string location)> ();
 
-            int startIndex = Segment.FindIndex(x => x.StopA == startLocation);
-            int endIndex = Segment.FindIndex(x => x.StopB == endLocation);
+            int startIndex = _segmentList.FindIndex(x => x.StopA.Name == startLocation);
+            int endIndex = _segmentList.FindIndex(x => x.StopB.Name == endLocation);
 
             for (int i = startIndex; i < endIndex; i++)
             {
-                route.Add((Segment[i].Distance, Segment[i].StopB));
+                route.Add((_segmentList[i].Distance, _segmentList[i].StopB.Name));
             }
 
-            return (Segment[0].StopA,route);
+            return (_segmentList[0].StopA.Name,route);
 
         }
 
         public List<string> ShowLocations() //Alle locaties van een route tonen.
         {
             List<string> locations = new List<string>();
+            locations.Add(_segmentList[0].StopA.Name); //eerste stop toevoegen
 
-            foreach (var item in Locations)
+            foreach (var item in _segmentList)
             {
-                locations.Add(item.Name);
+                locations.Add(item.StopB.Name);
             }
             return locations;
         }
@@ -174,27 +150,27 @@ namespace RouteRequirementsBL.Models
             double accumulatedDistance = 0;
             //instantie maken van de tuple list
             List<(double distance, string location)> route = new List<(double distance, string location)>();
-            //lopen over de dictionary en kijken of de locatie's op een route een stop zijn of niet.
-            for (int i = 0; i < Locations.Count - 1; i++)
+            //lopen over de list en kijken of de locatie's op een route een stop zijn of niet.
+            for (int i = 0; i < _segmentList.Count - 1; i++)
             {
-                accumulatedDistance += Segment[i].Distance;
+                accumulatedDistance += _segmentList[i].Distance;
 
-                if (SegmentLocatie[i + 1].IsStop)
+                if (_segmentList[i + 1].StopA.IsStop)
                 {
-                    route.Add((accumulatedDistance, Locations[i + 1].Name));
+                    route.Add((accumulatedDistance, _segmentList[i + 1].StopA.Name));
                     accumulatedDistance = 0;
                 }
             }
 
-            return (Segment[0].StopB, route);
+            return (_segmentList[0].StopA.Name, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute(string startLocation, string endLocation)
         {
 
             //linq statements om de index te vinden van startIndex en endIndex
-            int startIndex = Locations.FindIndex(loc => loc.Name == startLocation);
-            int endIndex = Locations.FindIndex(loc => loc.Name == endLocation);
+            int startIndex = _segmentList.FindIndex(loc => loc.StopA.Name == startLocation);
+            int endIndex = _segmentList.FindIndex(loc => loc.StopB.Name == endLocation);
 
             double accumulatedDistance = 0;
             //instantie maken van de tuple list
@@ -203,29 +179,32 @@ namespace RouteRequirementsBL.Models
 
             for (int i = startIndex; i < endIndex; i++)
             {
-                accumulatedDistance += Segment[i].Distance;
+                accumulatedDistance += _segmentList[i].Distance;
 
-                if (SegmentLocatie[i + 1].IsStop)
+                if (_segmentList[i + 1].StopA.IsStop)
                 {
-                    route.Add((accumulatedDistance, Locations[i + 1].Name));
+                    route.Add((accumulatedDistance, _segmentList[i + 1].StopA.Name));
                     accumulatedDistance = 0;
                 }
             }
 
-            return (Segment[0].StopB, route);
+            return (_segmentList[0].StopA.Name, route);
         }
 
         public List<string> ShowStops()
         {
-            List<string> stops = new List<string>();
+            List<string> stops = new List<string> {
+                    _segmentList[0].StopA.Name, //Eerste locatie is altijd een stop.
+                };
+            
             //Teller bijhouden zodat we weten op welke index we moeten zoeken voor de naam.
             int indexTeller = 0;
 
-            foreach (SegmentLocatie item in SegmentLocatie) //opm: beginstation is altijd een stop?
+            foreach (Segment item in _segmentList) //opm: beginstation is altijd een stop?
             {
-                if (item.IsStop == true)
+                if (item.StopB.IsStop == true)
                 {
-                    stops.Add(Locations[indexTeller].Name);
+                    stops.Add(_segmentList[indexTeller].StopB.Name);
                 }
                 indexTeller++;
             }
@@ -236,12 +215,16 @@ namespace RouteRequirementsBL.Models
         {
             int indexTeller = 0;
 
-            foreach (Location item in Locations)
+            foreach (var item in _segmentList)
             {
-                if (item.Name == location)
+                if (item.StopA.Name == location)
                 {
-                    item.Name = newName;
-                    SegmentLocatie[indexTeller].IsStop = isStop;
+                    item.StopA.Name = newName;
+                    _segmentList[indexTeller].StopA.IsStop = isStop;
+                } else if (item.StopB.Name == location)
+                {
+                    item.StopB.Name = newName;
+                    _segmentList[indexTeller].StopB.IsStop = isStop;
                 }
                 indexTeller++;
             }
