@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestApp", "TestApp", "{538A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{8678644C-E8DB-455E-A960-A85AC53233BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteRequirementsUnitTest", "RouteRequirementsUnitTest\RouteRequirementsUnitTest.csproj", "{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteRequirementsUnitTest", "RouteRequirementsUnitTest\RouteRequirementsUnitTest.csproj", "{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

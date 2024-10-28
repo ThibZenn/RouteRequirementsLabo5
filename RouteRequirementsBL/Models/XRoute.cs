@@ -12,7 +12,7 @@ namespace RouteRequirementsBL.Models
     public class XRoute : IRoute
     {
         
-        private List<Segment> _segmentList { get; set; }
+        internal List<Segment> _segmentList { get; set; }
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
         {

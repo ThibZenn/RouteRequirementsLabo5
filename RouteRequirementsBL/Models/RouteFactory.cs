@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace RouteRequirementsBL.Models
 {
@@ -19,9 +20,9 @@ namespace RouteRequirementsBL.Models
             //Errorfile leegmaken
             if (File.Exists(logFilePath)) File.WriteAllText(logFilePath, string.Empty);
 
-            List<Location> locationsList = new List<Location>();
-            List<Segment> distancesList = new List<Segment>();
-            List<SegmentLocatie> segmentList = new List<SegmentLocatie>();
+            List<string> locations = new List<string>();
+            List< bool > stops = new List<bool>();
+            List<double> distances = new List<double>();
 
             using (StreamReader sr = new StreamReader(fileName))
             {
@@ -45,57 +46,52 @@ namespace RouteRequirementsBL.Models
                         {
                             // omdat we groepen gemaakt hebben in onze regex kunnen we deze gemakkelijk toekennen.
                             string locationString = match.Groups[1].Value;
-                            int distanceInt = int.Parse(match.Groups[2].Value);
+                            double distanceInt = double.Parse(match.Groups[2].Value);
                             bool isStopBool = bool.Parse(match.Groups[3].Value);
 
                             // maak een nieuw object van locatie aan en voeg deze toe in de lijst.
-                            Location location = new Location(locationString);
-                            SegmentLocatie segmentLocatie = new SegmentLocatie(isStopBool);
-                            segmentList.Add(segmentLocatie);
-                            locationsList.Add(location);
+                            locations.Add(locationString);
+                            stops.Add(isStopBool);
+                            distances.Add(distanceInt);
 
-                            if (teller == 0)
-                            {
-                                // De eerste stop moet hetzelfde start als eindpunt hebben.
-                                Segment distance = new Segment(distanceInt, locationString, locationString);
-                                distancesList.Add(distance);
-                            }
-                            else
-                            {
-                                // Distance toekennen en puntA toewijzen met de data van de vorige locatie.
-                                Segment distance = new Segment(distanceInt, distancesList[teller - 1].StopB, locationString);
-                                distancesList.Add(distance);
-                            }
-
-                            teller++;
                         }
 
                         // Als er een match is met het tweede patroon gaan we verder
                         if (match2.Success)
                         {
-                            string locationString = match.Groups[1].Value;
-                            bool isStopBool = bool.Parse(match2.Groups[2].Value);
-                            int distanceInt = int.Parse(match2.Groups[5].Value);
-
-                            Location location = new Location(locationString);
-                            SegmentLocatie segmentLocatie = new SegmentLocatie(isStopBool);
-                            segmentList.Add(segmentLocatie);
-                            locationsList.Add(location);
-
-                            if(teller == 0)
+                            if (teller == 0)
                             {
-                                distancesMatch2.Add(0);
-                                distancesMatch2.Add(distanceInt);
-                                Segment distance = new Segment(distancesMatch2[teller], locationString, locationString);
-                                distancesList.Add(distance);
+                                bool isStopBool = false;
+                                bool isStopBool2 = false;
+                                string locationString = match.Groups[1].Value;
+                                string locationString2 = match.Groups[3].Value;
+
+                                if (match2.Groups[2].Value == "stop")
+                                    isStopBool = true;
+                                
+                                if (match2.Groups[4].Value == "stop")
+                                    isStopBool2 = true;
+
+                                int distanceInt = int.Parse(match2.Groups[5].Value);
+
+                                locations.Add(locationString);
+                                locations.Add(locationString2);
+                                stops.Add(isStopBool);
+                                stops.Add(isStopBool2);
+                                distances.Add(distanceInt);
+                                distances.Add(distanceInt);
+
+                            } else {
+                                string locationString = match.Groups[3].Value;
+                                bool isStopBool = false;
+                                if (match2.Groups[4].Value == "stop")
+                                    isStopBool = true;
+                                int distanceInt = int.Parse(match2.Groups[5].Value);
+
+                                locations.Add(locationString);
+                                stops.Add(isStopBool);
+                                distances.Add(distanceInt);
                             }
-                            else
-                            {
-                                Segment distance = new Segment(distancesMatch2[teller], distancesList[teller - 1].StopB, locationString);
-                                distancesList.Add(distance);
-                            }
-                            
-                            teller++;
                         }
                     }
                     catch (Exception ex)
@@ -105,18 +101,7 @@ namespace RouteRequirementsBL.Models
                 }
 
                 //add locations to the Route
-                foreach (Location location in locationsList)
-                {
-                    route.Locations.Add(location);
-                }
-                foreach (Segment distance in distancesList)
-                {
-                    route.Segment.Add(distance);
-                }
-                foreach (SegmentLocatie item in segmentList)
-                {
-                    route.SegmentLocatie.Add(item);
-                }
+                BuildRoute(locations, stops,distances);
             }
 
             return route;
@@ -124,8 +109,14 @@ namespace RouteRequirementsBL.Models
     
         public XRoute BuildRoute(List<string> locations, List<bool> stops, List<double> distances) 
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            XRoute route = new XRoute();
+            
+            for (int i = 0; i < locations.Count - 1; i++)
+            {
+                route._segmentList.Add(new Segment(distances[i], new SegmentLocatie(locations[i], stops[i]),new SegmentLocatie(locations[i+1], stops[i+1])));
+            }
 
+            return route;
         }
         public XRoute ReverseRoute(XRoute route) 
         {
