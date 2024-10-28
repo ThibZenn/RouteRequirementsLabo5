@@ -120,7 +120,18 @@ namespace RouteRequirementsBL.Models
         }
         public XRoute ReverseRoute(XRoute route) 
         {
-            throw new NotImplementedException(); //TODO method implementeren
+            XRoute reversedRoute = route;
+
+            foreach (Segment segment in reversedRoute._segmentList)
+            {
+                SegmentLocatie replacementLocation = segment.StopA;
+                segment.StopA = segment.StopB;
+                segment.StopB = replacementLocation;
+            }
+
+            reversedRoute._segmentList.Reverse();
+
+            return reversedRoute;
         }
     }
 }
