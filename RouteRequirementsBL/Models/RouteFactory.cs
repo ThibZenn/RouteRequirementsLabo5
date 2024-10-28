@@ -111,7 +111,7 @@ namespace RouteRequirementsBL.Models
         {
             XRoute route = new XRoute();
             
-            for (int i = 0; i < locations.Count - 1; i++)
+            for (int i = 0; i < locations.Count - 2; i++)
             {
                 route._segmentList.Add(new Segment(distances[i + 1], new SegmentLocatie(locations[i], stops[i]),new SegmentLocatie(locations[i+1], stops[i+1])));
             }
