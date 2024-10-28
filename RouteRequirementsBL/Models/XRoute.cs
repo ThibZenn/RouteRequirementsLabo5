@@ -73,7 +73,7 @@ namespace RouteRequirementsBL.Models
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
             
-            int indexInsertLocation = _segmentList.FindIndex( x =>( x.StopA.Name == fromLocation) || (x.StopB.Name == fromLocation)) +1; //we doen +1 want zonder zouden we de index hebben van de fromlocatie zelf.
+            int indexInsertLocation = _segmentList.FindIndex( x => x.StopA.Name == fromLocation +1); //we doen +1 want zonder zouden we de index hebben van de fromlocatie zelf.
 
             //TODO insertLocation toevoegen
         }

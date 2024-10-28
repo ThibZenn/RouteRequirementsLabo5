@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteRequirementsBL", "RouteRequirementsBL\RouteRequirementsBL.csproj", "{4F519BAC-89E0-48AB-8892-2A72E8225781}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteRequirementsBL", "RouteRequirementsBL\RouteRequirementsBL.csproj", "{4F519BAC-89E0-48AB-8892-2A72E8225781}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestApp", "TestApp", "{538AE48E-A881-4E14-BADE-2ECC7D44AF54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{8678644C-E8DB-455E-A960-A85AC53233BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{8678644C-E8DB-455E-A960-A85AC53233BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteRequirementsUnitTest", "RouteRequirementsUnitTest\RouteRequirementsUnitTest.csproj", "{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{8678644C-E8DB-455E-A960-A85AC53233BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8678644C-E8DB-455E-A960-A85AC53233BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8678644C-E8DB-455E-A960-A85AC53233BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF7CBFE3-7486-4A3D-BE25-E244A3A6527B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
