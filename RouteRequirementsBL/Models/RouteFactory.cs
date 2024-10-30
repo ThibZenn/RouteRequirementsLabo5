@@ -111,7 +111,7 @@ namespace RouteRequirementsBL.Models
         {
             XRoute route = new XRoute();
             
-            for (int i = 0; i < locations.Count - 2; i++)
+            for (int i = 0; i < locations.Count - 1; i++)
             {
                 route._segmentList.Add(new Segment(distances[i + 1], new SegmentLocatie(locations[i], stops[i]),new SegmentLocatie(locations[i+1], stops[i+1])));
             }
@@ -120,16 +120,19 @@ namespace RouteRequirementsBL.Models
         }
         public XRoute ReverseRoute(XRoute route) 
         {
-            XRoute reversedRoute = route;
 
-            foreach (Segment segment in reversedRoute._segmentList)
+            // Check if the input route is null or has no segments
+            if (route == null || route._segmentList == null)
             {
-                SegmentLocatie replacementLocation = segment.StopA;
-                segment.StopA = segment.StopB;
-                segment.StopB = replacementLocation;
+                throw new ArgumentNullException(nameof(route), "Route or route segments cannot be null.");
             }
 
-            reversedRoute._segmentList.Reverse();
+            XRoute reversedRoute = new XRoute() ;
+
+            foreach (Segment segment in route._segmentList.AsEnumerable().Reverse())
+            {
+                reversedRoute._segmentList.Add(new Segment(segment.Distance, new SegmentLocatie ( segment.StopB.Name, segment.StopB.IsStop), new SegmentLocatie(segment.StopA.Name, segment.StopA.IsStop)));
+            }
 
             return reversedRoute;
         }
