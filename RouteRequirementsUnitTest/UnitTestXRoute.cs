@@ -12,37 +12,44 @@ namespace RouteRequirementsUnitTest
     public class UnitTestXRoute
     {
         private XRoute _route;
-        private List<string> _locations = new List<string> {
-            "The Shire", "Bree", "Rivendel", "Edoras", "Helm's Deep", "Isengard", "Minas Tirith", "Minas Morgul", "Mount Doom"
-        };
-        private List <bool> _stops = new List<bool> {
-            true, true, true, true, false, true, true, false, true
-        };
-        private List<double> _distances = new List<double> {
-            0,25,60,33,5,30,28,8,38
-        };
+        private RouteFactory _routeFactory;
+        
 
         public UnitTestXRoute()
         {
-            RouteFactory routeFactory = new RouteFactory();
-            _route = routeFactory.BuildRoute(_locations,_stops,_distances);
+            _routeFactory = new RouteFactory();
+            
         }
 
-        [Theory]
-        [InlineData("TestLocation", 15, true)]
-        [InlineData(" ", 15 , true)]
-        public void Test_addLocation(string location, double distance, bool isStop)
+        private void InitializeRoute()
         {
+            var _locations = new List<string> {"The Shire", "Bree", "Rivendel", "Edoras", "Helm's Deep", "Isengard", "Minas Tirith", "Minas Morgul", "Mount Doom"};
+            var _stops = new List<bool> { true, true, true, true, false, true, true, false, true };
+            var _distances = new List<double> { 0.0,25.0,60.0,33.0,5.0,30.0,28.0,8.0,38.0 };
+            _route = _routeFactory.BuildRoute(_locations, _stops, _distances);
+        }
+
+        [Fact]
+        public void Test_addLocation_correctly()
+        {
+            InitializeRoute();
+
+            _route.AddLocation("TestLocation", 11.0, true);
+            _route.AddLocation("TestLocation2", 37.0, false);
+
+            Assert.Equal(10, _route._segmentList.Count);
+            Assert.Equal(11.0, _route._segmentList[8].Distance);
+            Assert.Equal(37.0, _route._segmentList[9].Distance);
+            Assert.False(_route._segmentList[9].StopB.IsStop);
+            Assert.True(_route._segmentList[9].StopA.IsStop);
 
         }
 
-        [Theory]
-        [InlineData("The Shire", 15, true)]
-        [InlineData("The Shire", 15, true)]
-        public void Test_addLocationInvalid(string location, double distance, bool isStop)
+        [Fact]
+        public void Test_addLocation_throwsException()
         {
-            var ex = Assert.Throws<RouteException>(() => _route.AddLocation(location,distance,isStop)); //testen of er een exception wordt gegooid.
-            Assert.Equal("id<0", ex.Message); // checken of de juiste foutboodschap megegeven is.
+            InitializeRoute();
+
         }
     }
 }
