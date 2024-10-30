@@ -12,11 +12,11 @@ namespace RouteRequirementsBL.Models
     public class XRoute : IRoute
     {
         
-        internal List<Segment> _segmentList { get; set; }
+        internal List<Segment> _segmentList;
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
         {
-            
+            _segmentList = new List<Segment>();
         }
 
         public void AddLocation(string location, double distance, bool isStop)
