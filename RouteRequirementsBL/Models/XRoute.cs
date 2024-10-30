@@ -12,7 +12,7 @@ namespace RouteRequirementsBL.Models
     public class XRoute : IRoute
     {
         
-        internal List<Segment> _segmentList;
+        public List<Segment> _segmentList; //TODO private zetten, maar nu staat hij public voor de unit testen.
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
         {
