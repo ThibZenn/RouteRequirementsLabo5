@@ -24,6 +24,9 @@ namespace RouteRequirementsBL.Models
             if (_segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location)))
             {
                 throw new RouteException($"{location} bestaat al");
+            } else if (!char.IsUpper(location[0]))
+            {
+                throw new RouteException($"{location} begint niet met een hoofdletter");
             }
 
             _segmentList.Add(new RouteSegment(distance, _segmentList[_segmentList.Count - 1].StopB, new LocationSegment(location,isStop)));
@@ -74,7 +77,8 @@ namespace RouteRequirementsBL.Models
 
         public bool HasStop(string location)
         {
-            return _segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location));
+            
+            return _segmentList.Where(x => x.StopA.Name == location).Select( x => x.StopA.IsStop).First();
         }
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
@@ -118,7 +122,7 @@ namespace RouteRequirementsBL.Models
 
         }
 
-        public void SetDistance(double distance, string location1, string location2)
+        public void SetDistance(double distance, string location1, string location2) //TODO: check of locations bestaan?
         {
             foreach (RouteSegment item in _segmentList)
             {
@@ -129,7 +133,7 @@ namespace RouteRequirementsBL.Models
             }
         }
 
-        public (string start, List<(double distance, string location)>) ShowFullRoute() //OPM: mag de beginStop nog in de list voorkomen?
+        public (string start, List<(double distance, string location)>) ShowFullRoute() 
         {
             //nieuwe instantie van de tuple lijst aanmaken
             List<(double distance, string location)> route = new List<(double distance, string location)>();
@@ -143,12 +147,12 @@ namespace RouteRequirementsBL.Models
             return (_segmentList[0].StopA.Name, route);
         }
 
-        public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation)
+        public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation) //TODO: check of locations bestaan + de volgorde van de meegeven route moet juist staan + start en stop moeten een stop locatie zijn.
         {
             //nieuwe instantie van de tuple lijst maken
             List<(double distance, string location)> route = new List<(double distance, string location)> ();
 
-            int startIndex = _segmentList.FindIndex(x => x.StopA.Name == startLocation);
+            int startIndex = _segmentList.FindIndex(x => x.StopB.Name == startLocation);
             int endIndex = _segmentList.FindIndex(x => x.StopB.Name == endLocation);
 
             for (int i = startIndex; i < endIndex; i++)
@@ -156,7 +160,7 @@ namespace RouteRequirementsBL.Models
                 route.Add((_segmentList[i].Distance, _segmentList[i].StopB.Name));
             }
 
-            return (_segmentList[0].StopA.Name,route);
+            return (startLocation,route);
 
         }
 
@@ -177,7 +181,7 @@ namespace RouteRequirementsBL.Models
             double accumulatedDistance = 0;
             //instantie maken van de tuple list
             List<(double distance, string location)> route = new List<(double distance, string location)>();
-            //lopen over de list en kijken of de locatie's op een route een stop zijn of niet.
+            //loopen over de list en kijken of de locatie's op een route een stop zijn of niet.
             for (int i = 0; i < _segmentList.Count - 1; i++)
             {
                 accumulatedDistance += _segmentList[i].Distance;
