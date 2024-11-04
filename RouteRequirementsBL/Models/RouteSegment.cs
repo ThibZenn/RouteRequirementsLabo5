@@ -7,7 +7,7 @@ using RouteRequirementsBL.Exceptions;
 
 namespace RouteRequirementsBL.Models
 {
-    public class Segment
+    public class RouteSegment
     {
         private double _distance;
 
@@ -23,10 +23,10 @@ namespace RouteRequirementsBL.Models
                 _distance = value;
             }
         }
-        public SegmentLocatie StopA { get; set; }
-        public SegmentLocatie StopB { get; set; }
+        public LocationSegment StopA { get; set; }
+        public LocationSegment StopB { get; set; }
 
-        public Segment(double distance, SegmentLocatie stopA, SegmentLocatie stopB)
+        public RouteSegment(double distance, LocationSegment stopA, LocationSegment stopB)
         {
             Distance = distance;
             StopA = stopA;

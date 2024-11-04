@@ -111,9 +111,9 @@ namespace RouteRequirementsBL.Models
         {
             XRoute route = new XRoute();
             
-            for (int i = 0; i < locations.Count - 1; i++)
+            for (int i = 0; i < locations.Count; i++)
             {
-                route._segmentList.Add(new Segment(distances[i + 1], new SegmentLocatie(locations[i], stops[i]),new SegmentLocatie(locations[i+1], stops[i+1])));
+                route._segmentList.Add(new RouteSegment(distances[i + 1], new LocationSegment(locations[i], stops[i]),new LocationSegment(locations[i+1], stops[i+1])));
             }
 
             return route;
@@ -129,9 +129,9 @@ namespace RouteRequirementsBL.Models
 
             XRoute reversedRoute = new XRoute() ;
 
-            foreach (Segment segment in route._segmentList.AsEnumerable().Reverse())
+            foreach (RouteSegment segment in route._segmentList.AsEnumerable().Reverse())
             {
-                reversedRoute._segmentList.Add(new Segment(segment.Distance, new SegmentLocatie ( segment.StopB.Name, segment.StopB.IsStop), new SegmentLocatie(segment.StopA.Name, segment.StopA.IsStop)));
+                reversedRoute._segmentList.Add(new RouteSegment(segment.Distance, new LocationSegment ( segment.StopB.Name, segment.StopB.IsStop), new LocationSegment(segment.StopA.Name, segment.StopA.IsStop)));
             }
 
             return reversedRoute;

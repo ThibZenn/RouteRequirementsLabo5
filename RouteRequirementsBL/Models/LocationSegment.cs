@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RouteRequirementsBL.Models
 {
-    public class SegmentLocatie : Location
+    public class LocationSegment : Location
     {
-        public SegmentLocatie(string name, bool isStop) : base(name)
+        public LocationSegment(string name, bool isStop) : base(name)
         {
             IsStop = isStop;
         }
