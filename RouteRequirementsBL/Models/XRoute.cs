@@ -109,7 +109,7 @@ namespace RouteRequirementsBL.Models
             _segmentList[index].Distance = distance;
         }
 
-        public void RemoveLocation(string location)
+        public void RemoveLocation(string location) //TODO: Exceptions schrijven
         {
             int indexOfLocation = _segmentList.FindIndex(x => (x.StopA.Name == location) || (x.StopB.Name == location));
             //distance van te verwijderen segment opslaan
@@ -183,22 +183,10 @@ namespace RouteRequirementsBL.Models
 
         public (string start, List<(double distance, string location)>) ShowRoute() // De hele route behalve degenen die geen stop zijn
         {
-            double accumulatedDistance = 0;
-            //instantie maken van de tuple list
-            List<(double distance, string location)> route = new List<(double distance, string location)>();
-            //loopen over de list en kijken of de locatie's op een route een stop zijn of niet.
-            for (int i = 0; i < _segmentList.Count - 1; i++)
-            {
-                accumulatedDistance += _segmentList[i].Distance;
+            string startLocation = _segmentList[0].StopA.Name;
+            string endLocation = _segmentList[_segmentList.Count - 1].StopB.Name;
 
-                if (_segmentList[i + 1].StopA.IsStop)
-                {
-                    route.Add((accumulatedDistance, _segmentList[i + 1].StopA.Name));
-                    accumulatedDistance = 0;
-                }
-            }
-
-            return (_segmentList[0].StopA.Name, route);
+            return ShowRoute(startLocation, endLocation);
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute(string startLocation, string endLocation)
@@ -207,6 +195,21 @@ namespace RouteRequirementsBL.Models
             //linq statements om de index te vinden van startIndex en endIndex
             int startIndex = _segmentList.FindIndex(loc => loc.StopA.Name == startLocation);
             int endIndex = _segmentList.FindIndex(loc => loc.StopB.Name == endLocation);
+
+            if (startIndex < 0 || endIndex < 0)
+            {
+                throw new RouteException($"{startLocation} or {endLocation} doesn't excist in the current route.");
+            }
+
+            if (endIndex < startIndex)
+            {
+                throw new RouteException("End location must come after start location.");
+            }
+
+            if ((!_segmentList[startIndex].StopA.IsStop) || (!_segmentList[endIndex].StopB.IsStop))
+            {
+                throw new RouteException($"{startLocation} or {endLocation} isn't a stop in the current route.");
+            }
 
             double accumulatedDistance = 0;
             //instantie maken van de tuple list
@@ -217,14 +220,14 @@ namespace RouteRequirementsBL.Models
             {
                 accumulatedDistance += _segmentList[i].Distance;
 
-                if (_segmentList[i + 1].StopA.IsStop)
+                if (_segmentList[i].StopB.IsStop)
                 {
-                    route.Add((accumulatedDistance, _segmentList[i + 1].StopA.Name));
+                    route.Add((accumulatedDistance, _segmentList[i].StopB.Name));
                     accumulatedDistance = 0;
                 }
             }
 
-            return (_segmentList[0].StopA.Name, route);
+            return (startLocation, route);
         }
 
         public List<string> ShowStops()
