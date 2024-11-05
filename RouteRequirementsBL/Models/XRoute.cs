@@ -122,8 +122,13 @@ namespace RouteRequirementsBL.Models
 
         }
 
-        public void SetDistance(double distance, string location1, string location2) //TODO: check of locations bestaan?
+        public void SetDistance(double distance, string location1, string location2)
         {
+            if (!_segmentList.Exists(x => (x.StopA.Name == location1) || (x.StopA.Name == location2)))
+            {
+                throw new RouteException($"{location1} of {location2} doesn't excist in the current route");
+            }
+
             foreach (RouteSegment item in _segmentList)
             {
                 if (item.StopA.Name == location1 && item.StopB.Name == location2)
