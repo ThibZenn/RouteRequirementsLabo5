@@ -81,14 +81,14 @@ namespace RouteRequirementsBL.Models
             return _segmentList.Where(x => x.StopA.Name == location).Select( x => x.StopA.IsStop).First();
         }
 
-        public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
+        public void InsertLocation(string location, double distance, string fromLocation, bool isStop) //TODO: hoofdletter afdwingen
         {
             
             int index = _segmentList.FindIndex( x => x.StopA.Name == fromLocation); 
 
             if (index < 0)
             {
-                throw new RouteException("The fromLocation doesn't excist.");
+                throw new RouteException("The fromLocation doesn't exist.");
             }
 
             double currentSegmentDistance = _segmentList[index].Distance;
@@ -111,14 +111,34 @@ namespace RouteRequirementsBL.Models
 
         public void RemoveLocation(string location) //TODO: Exceptions schrijven
         {
-            int indexOfLocation = _segmentList.FindIndex(x => (x.StopA.Name == location) || (x.StopB.Name == location));
-            //distance van te verwijderen segment opslaan
-            double distance = _segmentList[indexOfLocation].Distance;
-            //segment op die index verwijderen
-            _segmentList.RemoveAt(indexOfLocation);
-            //segment +1 moet aangepast worden
-            _segmentList[indexOfLocation + 1].Distance += distance;
-            _segmentList[indexOfLocation + 1].StopA = _segmentList[indexOfLocation].StopB;
+            //eerste locatie
+            if (_segmentList[0].StopA.Name == location)
+            {
+                _segmentList.RemoveAt(0); //Het gehele eerste segment gaat weg en we moeten geen distance herrekenen.
+                return;
+            }
+
+            int indexOfLocation = _segmentList.FindIndex(x => x.StopB.Name == location);
+
+            if (indexOfLocation < 0)
+            {
+                throw new RouteException("The fromLocation doesn't exist.");
+            }
+
+            if (indexOfLocation > 0 && indexOfLocation < _segmentList.Count - 1)
+            {
+                //distance van te verwijderen segment opslaan
+                double distance = _segmentList[indexOfLocation].Distance + _segmentList[indexOfLocation + 1].Distance;
+
+                //nieuw segment aanmaken
+                _segmentList[indexOfLocation] = new RouteSegment(distance, _segmentList[indexOfLocation].StopA, _segmentList[indexOfLocation + 1].StopB);
+                //segment op die index verwijderen
+                _segmentList.RemoveAt(indexOfLocation +1);
+            }
+            else if (indexOfLocation == _segmentList.Count - 1) //als het de laatste locatie is
+            {
+                _segmentList.RemoveAt(indexOfLocation);
+            }
 
         }
 
@@ -216,7 +236,7 @@ namespace RouteRequirementsBL.Models
             List<(double distance, string location)> route = new List<(double distance, string location)>();
             //lopen over de dictionary en kijken of de locatie's op een route een stop zijn of niet.
 
-            for (int i = startIndex; i < endIndex; i++)
+            for (int i = startIndex; i <= endIndex; i++)
             {
                 accumulatedDistance += _segmentList[i].Distance;
 
@@ -232,40 +252,49 @@ namespace RouteRequirementsBL.Models
 
         public List<string> ShowStops()
         {
-            List<string> stops = new List<string> {
-                    _segmentList[0].StopA.Name, //Eerste locatie is altijd een stop.
-                };
-            
-            //Teller bijhouden zodat we weten op welke index we moeten zoeken voor de naam.
-            int indexTeller = 0;
+            HashSet<string> stops = new HashSet<string> (); // op deze manier zorgen we ervoor dat er geen dubbels in onze lijst voorkomen. Hashset aanvaard enkel maar unieke entries.
 
-            foreach (RouteSegment item in _segmentList) //opm: beginstation is altijd een stop?
+            for (int i = 0; i < _segmentList.Count; i++)
             {
-                if (item.StopB.IsStop == true)
+                if (_segmentList[i].StopA.IsStop)
                 {
-                    stops.Add(_segmentList[indexTeller].StopB.Name);
+                    stops.Add(_segmentList[i].StopA.Name);
                 }
-                indexTeller++;
+                if (_segmentList[i].StopB.IsStop)
+                {
+                    stops.Add(_segmentList[i].StopB.Name);
+                }
             }
-            return stops;
+            return stops.ToList();
         }
 
-        public void UpdateLocation(string location, string newName, bool isStop)
+        public void UpdateLocation(string location, string newName, bool isStop) //TODO: check op hoofdletter bij aanpassen naar newName + Afdwingen dat newName ook met hoofdletter moet beginnen
         {
-            int indexTeller = 0;
+            //locationsegment object voor segment aan te passen
+            LocationSegment updateLocation = new LocationSegment(newName, isStop);
 
-            foreach (var item in _segmentList)
+            //check if the newName already excists in the current context
+            if (_segmentList.Any(x => (x.StopB.Name == newName) || (x.StopA.Name == newName))) { throw new RouteException($"{newName} already exists in the current route."); }
+
+            // als het de eerste locatie van de route is
+            if (_segmentList[0].StopA.Name == location)
             {
-                if (item.StopA.Name == location)
-                {
-                    item.StopA.Name = newName;
-                    _segmentList[indexTeller].StopA.IsStop = isStop;
-                } else if (item.StopB.Name == location)
-                {
-                    item.StopB.Name = newName;
-                    _segmentList[indexTeller].StopB.IsStop = isStop;
-                }
-                indexTeller++;
+                _segmentList[0].StopA = updateLocation;
+                return;
+            }
+            // als het niet de eerste locatie is, de juiste index opzoeken
+            int indexLoc = _segmentList.FindIndex(x => x.StopB.Name == location);
+
+            //check of de up te daten locatie bestaat in de route
+            if (indexLoc == -1) { throw new RouteException($"{location} doesn't excist in the current route."); }
+            
+
+            //beide segmenten aanpassen (locatie zal bestaan in 2 segmenten)
+            _segmentList[indexLoc].StopB = updateLocation;
+
+            if (indexLoc < _segmentList.Count - 1) //als het niet de laatste locatie is
+            {
+                _segmentList[indexLoc + 1].StopA = updateLocation;
             }
         }
     }

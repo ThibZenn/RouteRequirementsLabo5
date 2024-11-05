@@ -19,7 +19,7 @@ namespace RouteRequirementsBL.Models
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new LocationException($"LocatieNaam is empty");
-                    //TODO in streamreader zorgen dat de naam altijd met een hoofdletter begint.
+                    //TODO: hoofdletter afdwingen? 
                 } 
                 _name = value;
             }
