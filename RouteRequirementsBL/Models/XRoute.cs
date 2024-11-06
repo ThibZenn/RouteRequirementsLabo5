@@ -24,9 +24,6 @@ namespace RouteRequirementsBL.Models
             if (_segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location)))
             {
                 throw new RouteException($"{location} bestaat al");
-            } else if (!char.IsUpper(location[0]))
-            {
-                throw new RouteException($"{location} begint niet met een hoofdletter");
             }
 
             _segmentList.Add(new RouteSegment(distance, _segmentList[_segmentList.Count - 1].StopB, new LocationSegment(location,isStop)));

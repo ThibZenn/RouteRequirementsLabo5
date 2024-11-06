@@ -20,7 +20,11 @@ namespace RouteRequirementsBL.Models
                 {
                     throw new LocationException($"LocatieNaam is empty");
                     //TODO: hoofdletter afdwingen? 
-                } 
+                }
+                else if (!char.IsUpper(value[0]))
+                {
+                    throw new RouteException($"{value} begint niet met een hoofdletter");
+                }
                 _name = value;
             }
         }
