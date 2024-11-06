@@ -12,7 +12,7 @@ namespace RouteRequirementsBL.Models
 {
     public class RouteFactory
     {
-        public XRoute BuildRouteFromFile(string fileName) //TODO capital check?
+        public XRoute BuildRouteFromFile(string fileName) 
         {
             //instantie van Xroute maken
             XRoute route = new XRoute();

@@ -19,7 +19,6 @@ namespace RouteRequirementsBL.Models
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new LocationException($"LocatieNaam is empty");
-                    //TODO: hoofdletter afdwingen? 
                 }
                 else if (!char.IsUpper(value[0]))
                 {

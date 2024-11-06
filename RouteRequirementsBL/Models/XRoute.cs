@@ -78,7 +78,7 @@ namespace RouteRequirementsBL.Models
             return _segmentList.Where(x => x.StopA.Name == location).Select( x => x.StopA.IsStop).First();
         }
 
-        public void InsertLocation(string location, double distance, string fromLocation, bool isStop) //TODO: hoofdletter afdwingen
+        public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
             
             int index = _segmentList.FindIndex( x => x.StopA.Name == fromLocation); 
@@ -265,7 +265,7 @@ namespace RouteRequirementsBL.Models
             return stops.ToList();
         }
 
-        public void UpdateLocation(string location, string newName, bool isStop) //TODO: check op hoofdletter bij aanpassen naar newName + Afdwingen dat newName ook met hoofdletter moet beginnen
+        public void UpdateLocation(string location, string newName, bool isStop) 
         {
             //locationsegment object voor segment aan te passen
             LocationSegment updateLocation = new LocationSegment(newName, isStop);

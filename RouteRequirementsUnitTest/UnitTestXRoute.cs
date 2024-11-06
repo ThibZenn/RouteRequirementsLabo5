@@ -15,6 +15,7 @@ namespace RouteRequirementsUnitTest
         private XRoute _route;
         private RouteFactory _routeFactory;
         
+        //TODO: checken of de originele data niet is aangepast
 
         public UnitTestXRoute()
         {
