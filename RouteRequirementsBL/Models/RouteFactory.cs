@@ -14,8 +14,6 @@ namespace RouteRequirementsBL.Models
     {
         public XRoute BuildRouteFromFile(string fileName) 
         {
-            //instantie van Xroute maken
-            XRoute route = new XRoute();
             //Errors bijhouden
             string logFilePath = @"C:\Users\thiba\Documents\HOGENT\Semester2\ProgGevorderd1\Labo5\RouteRequirementsBL\Errors\ErrorLogBuildRouteFromFile.log";
             //Errorfile leegmaken
@@ -45,7 +43,7 @@ namespace RouteRequirementsBL.Models
                         if (match.Success)
                         {
                             // omdat we groepen gemaakt hebben in onze regex kunnen we deze gemakkelijk toekennen.
-                            string locationString = match.Groups[1].Value;
+                            string locationName = match.Groups[1].Value;
 
                             if (!double.TryParse(match.Groups[2].Value, out double distanceInt))
                             {
@@ -56,15 +54,15 @@ namespace RouteRequirementsBL.Models
                             {
                                 throw new RouteException($"IsStop isn't a correct bool in line : {line}");
                             }
-                            
+                            stops.Add(isStopBool);
 
                             // maak een nieuw object van locatie aan en voeg deze toe in de lijst.
-                            locations.Add(locationString);
-                            if (distanceInt != 0) //We willen de distance van de eerste locatie niet opslaan in onze lijst.
+                            locations.Add(locationName);
+
+                            if (distanceInt != 0.0) //We willen de distance van de eerste locatie niet opslaan in onze lijst.
                             {
                                 distances.Add(distanceInt);
                             }
-                            distances.Add(distanceInt);
 
                         }
 
@@ -75,7 +73,7 @@ namespace RouteRequirementsBL.Models
                             string locationB = match2.Groups[3].Value;
                         
 
-                            if (!double.TryParse(match.Groups[2].Value, out double distance))
+                            if (!double.TryParse(match2.Groups[5].Value, out double distance))
                             {
                                 throw new RouteException($"Distance is't in the correct format in line : {line}");
                             }
@@ -118,11 +116,16 @@ namespace RouteRequirementsBL.Models
 
                             distances.Add (distance);
 
-                            if(!locations.Contains(locationB))
+                            if(!locations.Contains(locationA))
+                            {
+                                locations.Add(locationA);
+                                stops.Add(isStartStop);
+                            } 
+                            if (!locations.Contains(locationB))
                             {
                                 locations.Add(locationB);
                                 stops.Add(isEndStop);
-                            }
+                            } 
 
                         } else
                         {
@@ -135,7 +138,7 @@ namespace RouteRequirementsBL.Models
                     }
                 }
                 //add locations to the Route
-                BuildRoute(locations, stops, distances);
+                XRoute route = BuildRoute(locations, stops, distances);
                 return route;
             }
         }
@@ -155,12 +158,13 @@ namespace RouteRequirementsBL.Models
                     throw new RouteException("InputLists are empty");
 
                 // Voeg alle locaties toe
-                for (int i = 0; i < distances.Count-1; i++)
+                for (int i = 0; i < locations.Count-1; i++)
                 {
                     LocationSegment locationA = new LocationSegment(locations[i], stops[i]);
                     LocationSegment locationB = new LocationSegment(locations[i + 1], stops[i + 1]);
-                    RouteSegment segment = new RouteSegment(distances[i+1], locationA, locationB);
+                    RouteSegment segment = new RouteSegment(distances[i], locationA, locationB);
                     route._segmentList.Add(segment);
+
                 }
 
             }

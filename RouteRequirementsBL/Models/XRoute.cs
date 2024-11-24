@@ -40,7 +40,7 @@ namespace RouteRequirementsBL.Models
             return distance;
         }
 
-        public double GetDistance(string startLocation, string endLocation)
+        public double GetDistance(string startLocation, string endLocation) //TODO: check if startlocation is in front of the endlocation
         {
             double totalDistance = 0;
 
@@ -106,7 +106,7 @@ namespace RouteRequirementsBL.Models
             _segmentList[index].Distance = distance;
         }
 
-        public void RemoveLocation(string location) //TODO: Exceptions schrijven
+        public void RemoveLocation(string location)
         {
             //eerste locatie
             if (_segmentList[0].StopA.Name == location)

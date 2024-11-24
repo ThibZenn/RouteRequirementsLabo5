@@ -8,10 +8,10 @@ namespace TestApp
         {
             RouteFactory factory = new RouteFactory();
 
-            string data1 = @"C:\Users\thiba\Documents\HOGENT\Semester2\ProgGevorderd1\Labo5\data1";
-            string data2 = @"C:\Users\thiba\Documents\HOGENT\Semester2\ProgGevorderd1\Labo5\data2";
+            string data1 = @"C:\Users\thiba\Documents\HOGENT\Semester2\ProgGevorderd1\Labo5\data1.txt";
+            string data2 = @"C:\Users\thiba\Documents\HOGENT\Semester2\ProgGevorderd1\Labo5\data2.txt";
 
-            XRoute routeData1 = factory.BuildRouteFromFile(data1);
+            //XRoute routeData1 = factory.BuildRouteFromFile(data1);
             XRoute routeData2 = factory.BuildRouteFromFile(data2);
 
 
@@ -26,7 +26,7 @@ namespace TestApp
 
             Console.WriteLine();
 
-            XRoute reversedRoute = factory.ReverseRoute(routeData1);
+            XRoute reversedRoute = factory.ReverseRoute(routeData2);
 
             for (int i = 0; i < reversedRoute._segmentList.Count; i++)
             {
