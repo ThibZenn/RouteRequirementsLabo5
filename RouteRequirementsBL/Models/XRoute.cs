@@ -11,7 +11,7 @@ namespace RouteRequirementsBL.Models
 {
     public class XRoute : IRoute
     {
-        
+
         public List<RouteSegment> _segmentList; //TODO private zetten, maar nu staat hij public voor de unit testen.
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
@@ -26,7 +26,7 @@ namespace RouteRequirementsBL.Models
                 throw new RouteException($"{location} bestaat al");
             }
 
-            _segmentList.Add(new RouteSegment(distance, _segmentList[_segmentList.Count - 1].StopB, new LocationSegment(location,isStop)));
+            _segmentList.Add(new RouteSegment(distance, _segmentList[_segmentList.Count - 1].StopB, new LocationSegment(location, isStop)));
         }
 
         public double GetDistance() //Get the total distance
@@ -38,6 +38,9 @@ namespace RouteRequirementsBL.Models
                 distance += locatie.Distance;
             }
             return distance;
+
+            //LINQ
+            //return _segmentList.Sum( x => x.Distance);
         }
 
         public double GetDistance(string startLocation, string endLocation) //TODO: check if startlocation is in front of the endlocation
@@ -58,6 +61,15 @@ namespace RouteRequirementsBL.Models
             }
 
             return totalDistance;
+
+            //LINQ
+            //var range =_segmentList
+            //    .SkipWhile(x => x.StopA.Name != startLocation) // skip locations that are in front of the startlocation
+            //    .TakeWhile(x => x.StopB.Name != endLocation) // when we reached the startlocation TAKE the locations until we meet the endlocation
+            //    .Concat(_segmentList.Where(x => x.StopB.Name == endLocation).Take(1)) // include segment with end location
+            //    .ToList();
+
+            //return range.Sum( x => x.Distance); // make a sum of all the distances within the range
         }
 
         public bool HasLocation(string location) // kijken of de locatie in de route zit.
@@ -70,18 +82,39 @@ namespace RouteRequirementsBL.Models
                 }
             }
             return false;
+
+            //LINQ
+            // return _segmentList.Any( x => x.StopA.Name == location ||  x.StopB.Name == location); // checks if there is an element within that passes the condition.
         }
 
         public bool HasStop(string location)
         {
-            
-            return _segmentList.Where(x => x.StopA.Name == location).Select( x => x.StopA.IsStop).First();
+            foreach (var segment in _segmentList)
+            {
+                if (segment.StopA.Name == location)
+                {
+                    return segment.StopA.IsStop;
+                }
+
+                if (segment.StopB.Name == location)
+                {
+                    return segment.StopB.IsStop;
+                }
+            }
+            return false;
+
+
+            //LINQ
+            //return _segmentList
+            //    .Where(s => s.StopA.Name == location || s.StopB.Name == location)
+            //    .Select(s => s.StopA.Name == location ? s.StopA.IsStop : s.StopB.IsStop)
+            //    .FirstOrDefault();
         }
 
         public void InsertLocation(string location, double distance, string fromLocation, bool isStop)
         {
-            
-            int index = _segmentList.FindIndex( x => x.StopA.Name == fromLocation); 
+
+            int index = _segmentList.FindIndex(x => x.StopA.Name == fromLocation);
 
             if (index < 0)
             {
@@ -98,8 +131,8 @@ namespace RouteRequirementsBL.Models
 
             //nieuw segment maken
             LocationSegment insertFirstLocation = new LocationSegment(location, isStop);
-            RouteSegment insertSegment = new RouteSegment( updatedDistance, insertFirstLocation, _segmentList[index].StopB);
-            _segmentList.Insert(index + 1 , insertSegment); // +1 zodat we op de juiste locatie gaan inserten
+            RouteSegment insertSegment = new RouteSegment(updatedDistance, insertFirstLocation, _segmentList[index].StopB);
+            _segmentList.Insert(index + 1, insertSegment); // +1 zodat we op de juiste locatie gaan inserten
 
             //vorig segment aanpassen
             _segmentList[index].StopB = insertFirstLocation;
@@ -130,7 +163,7 @@ namespace RouteRequirementsBL.Models
                 //nieuw segment aanmaken
                 _segmentList[indexOfLocation] = new RouteSegment(distance, _segmentList[indexOfLocation].StopA, _segmentList[indexOfLocation + 1].StopB);
                 //segment op die index verwijderen
-                _segmentList.RemoveAt(indexOfLocation +1);
+                _segmentList.RemoveAt(indexOfLocation + 1);
             }
             else if (indexOfLocation == _segmentList.Count - 1) //als het de laatste locatie is
             {
@@ -155,8 +188,13 @@ namespace RouteRequirementsBL.Models
             }
         }
 
-        public (string start, List<(double distance, string location)>) ShowFullRoute() 
+        public (string start, List<(double distance, string location)>) ShowFullRoute()
         {
+            if (_segmentList.Count == 0)
+            {
+                throw new RouteException("ShowFullRoute: _segmentList is empty");
+            }
+
             //nieuwe instantie van de tuple lijst aanmaken
             List<(double distance, string location)> route = new List<(double distance, string location)>();
 
@@ -167,12 +205,18 @@ namespace RouteRequirementsBL.Models
             }
 
             return (_segmentList[0].StopA.Name, route);
+
+            //LINQ
+            //var route = _segmentList.Select( x => (x.Distance, x.StopB.Name))
+            //    .ToList();
+
+            //return (_segmentList.First().StopA.Name, route);
         }
 
         public (string start, List<(double distance, string location)>) ShowFullRoute(string startLocation, string endLocation) //TODO: check of locations bestaan + de volgorde van de meegeven route moet juist staan + start en stop moeten een stop locatie zijn.
         {
             //nieuwe instantie van de tuple lijst maken
-            List<(double distance, string location)> route = new List<(double distance, string location)> ();
+            List<(double distance, string location)> route = new List<(double distance, string location)>();
 
             int startIndex = _segmentList.FindIndex(x => x.StopB.Name == startLocation);
             int endIndex = _segmentList.FindIndex(x => x.StopB.Name == endLocation);
@@ -182,7 +226,18 @@ namespace RouteRequirementsBL.Models
                 route.Add((_segmentList[i].Distance, _segmentList[i].StopB.Name));
             }
 
-            return (startLocation,route);
+            return (startLocation, route);
+
+            //LINQ
+            //var route = _segmentList
+            //        .SkipWhile(s => s.StopA.Name != startLocation)
+            //        .TakeWhile(s => s.StopB.Name != endLocation)
+            //        .Concat(_segmentList.Where(s => s.StopB.Name == endLocation).Take(1)) // Include segment with end location
+            //        .Select(s => (s.Distance, s.StopB.Name))
+            //        .ToList();
+
+            //return (startLocation, route);
+
 
         }
 
@@ -196,6 +251,12 @@ namespace RouteRequirementsBL.Models
                 locations.Add(item.StopB.Name);
             }
             return locations;
+
+            ////LINQ
+            //return _segmentList
+            //    .SelectMany( x => new[] { x.StopA.Name, x.StopB.Name })
+            //    .Distinct()
+            //    .ToList();
         }
 
         public (string start, List<(double distance, string location)>) ShowRoute() // De hele route behalve degenen die geen stop zijn
@@ -249,10 +310,12 @@ namespace RouteRequirementsBL.Models
 
         public List<string> ShowStops()
         {
-            HashSet<string> stops = new HashSet<string> (); // op deze manier zorgen we ervoor dat er geen dubbels in onze lijst voorkomen. Hashset aanvaard enkel maar unieke entries.
+            HashSet<string> stops = new HashSet<string>(); // op deze manier zorgen we ervoor dat er geen dubbels in onze lijst voorkomen. Hashset aanvaard enkel maar unieke entries.
 
+            // loop over alle segmenten
             for (int i = 0; i < _segmentList.Count; i++)
             {
+                //als we een stopplaats tegenkomen toevoegen aan de hashset
                 if (_segmentList[i].StopA.IsStop)
                 {
                     stops.Add(_segmentList[i].StopA.Name);
@@ -263,9 +326,17 @@ namespace RouteRequirementsBL.Models
                 }
             }
             return stops.ToList();
+
+            //LINQ
+            //return _segmentList
+            //    .SelectMany(x => new[] { x.StopA, x.StopB })
+            //    .Where(location => location.IsStop)
+            //    .Select(location => location.Name)
+            //    .Distinct()
+            //    .ToList();
         }
 
-        public void UpdateLocation(string location, string newName, bool isStop) 
+        public void UpdateLocation(string location, string newName, bool isStop)
         {
             //locationsegment object voor segment aan te passen
             LocationSegment updateLocation = new LocationSegment(newName, isStop);
@@ -284,7 +355,7 @@ namespace RouteRequirementsBL.Models
 
             //check of de up te daten locatie bestaat in de route
             if (indexLoc == -1) { throw new RouteException($"{location} doesn't excist in the current route."); }
-            
+
 
             //beide segmenten aanpassen (locatie zal bestaan in 2 segmenten)
             _segmentList[indexLoc].StopB = updateLocation;
