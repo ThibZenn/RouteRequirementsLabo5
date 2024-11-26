@@ -47,8 +47,8 @@ namespace RouteRequirementsBL.Models
         {
             double totalDistance = 0;
 
-            int startIndex = _segmentList.FindIndex(x => x.StopA.Name.ToLower() == startLocation.ToLower());
-            int endIndex = _segmentList.FindIndex(x => x.StopB.Name.ToLower() == endLocation.ToLower());
+            int startIndex = _segmentList.FindIndex(x => x.StopA.Name == startLocation);
+            int endIndex = _segmentList.FindIndex(x => x.StopB.Name == endLocation);
 
             if (startIndex < 0 || endIndex < 0)
             {
