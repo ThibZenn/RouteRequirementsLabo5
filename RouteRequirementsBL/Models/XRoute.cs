@@ -12,7 +12,7 @@ namespace RouteRequirementsBL.Models
     public class XRoute : IRoute
     {
 
-        public List<RouteSegment> _segmentList; //TODO private zetten, maar nu staat hij public voor de unit testen.
+        public List<RouteSegment> _segmentList;
 
         internal XRoute() // op internal zetten zodat er niet van buitenaf een instantie van Route gemaakt kan worden
         {
@@ -23,7 +23,7 @@ namespace RouteRequirementsBL.Models
         {
             if (_segmentList.Exists(x => (x.StopA.Name == location) || (x.StopB.Name == location)))
             {
-                throw new RouteException($"{location} bestaat al");
+                throw new RouteException($"{location} already exists");
             }
 
             _segmentList.Add(new RouteSegment(distance, _segmentList[_segmentList.Count - 1].StopB, new LocationSegment(location, isStop)));
@@ -52,7 +52,7 @@ namespace RouteRequirementsBL.Models
 
             if (startIndex < 0 || endIndex < 0)
             {
-                throw new RouteException($"{startIndex} or {endIndex} doesn't excist in the current route.");
+                throw new RouteException($"{startIndex} or {endIndex} doesn't exist in the current route.");
             }
 
             for (int i = startIndex; i <= endIndex; i++)
@@ -176,7 +176,7 @@ namespace RouteRequirementsBL.Models
         {
             if (!_segmentList.Exists(x => (x.StopA.Name == location1) || (x.StopA.Name == location2)))
             {
-                throw new RouteException($"{location1} of {location2} doesn't excist in the current route");
+                throw new RouteException($"{location1} of {location2} doesn't exist in the current route");
             }
 
             foreach (RouteSegment item in _segmentList)
