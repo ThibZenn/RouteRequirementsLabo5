@@ -27,7 +27,6 @@ namespace RouteRequirementsBL.Models
             {
                 //Lijn die gelezen wordt.
                 string line;
-                int teller = 0;
 
                 while ((line = sr.ReadLine()) != null)
                 {
